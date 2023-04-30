@@ -1,10 +1,13 @@
-import express, { json, urlencoded } from "express";
+const express = require("express");
 const app = express();
+
+require("dotenv").config();
 const port = process.env.PORT || 3000;
 
-import routes from "./routes";
-app.use(json());
-app.use(urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const routes = require("./routes");
 app.use(routes);
 
 app.listen(port, () => {
