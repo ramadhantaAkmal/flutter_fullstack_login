@@ -13,7 +13,7 @@ class AccountController {
         if (decrypt(password, result.password)) {
           let access_token = generateToken(result);
           let token = verifToken(access_token);
-          res.status(200).json({ access_token });
+          res.status(200).json({ access_token, userId: result.id });
         } else {
           res.status(403).json({ message: "Password Wrong" });
         }
@@ -21,6 +21,7 @@ class AccountController {
         res.status(404).json({ message: "Username Not Found" });
       }
     } catch (error) {
+      console.log(req.body);
       res.status(500).json(error);
     }
   }
@@ -42,7 +43,8 @@ class AccountController {
 
   static async getacc(req, res){
     try {
-      let result = await account.findAll();
+      const id = +req.params.id;
+      let result = await account.findByPk(id);
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json(error);

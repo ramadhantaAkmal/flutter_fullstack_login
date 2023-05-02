@@ -1,5 +1,9 @@
-import 'package:flutter/gestures.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_login_nodejs/fetch/account_fetch.dart';
+import 'package:flutter_login_nodejs/view/main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -44,10 +48,11 @@ class _LoginState extends State<Login> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 2,
               ),
               TextFormField(
+                controller: _usernameController,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   labelText: 'Username',
@@ -69,10 +74,11 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextFormField(
+                controller: _passwordController,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   labelText: 'Password',
@@ -99,18 +105,31 @@ class _LoginState extends State<Login> {
                 padding: const EdgeInsets.symmetric(horizontal: 35),
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: MaterialButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final result = await AccountApi.userLogin(
+                        _usernameController.text, _passwordController.text);
+
+                    if (result is String) {
+                      print(result);
+                    } else {
+                      SharedPreferences pref =
+                          await SharedPreferences.getInstance();
+                      await pref.setString('token', jsonEncode(result));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const MainPage()));
+                    }
+                  },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  child: Text(
+                  color: Colors.blueAccent,
+                  child: const Text(
                     'Log In',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.orange),
                   ),
-                  color: Colors.blueAccent,
                 ),
               ),
             ],
